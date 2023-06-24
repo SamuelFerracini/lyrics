@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen flex flex-col items-center p-4">
-    <SearchBar @submit="handleSubmit" />
+    <SearchBar @submit="handleSubmit" @reset="handleReset" />
 
     <!-- <div id="embed-iframe"></div> -->
 
@@ -12,33 +12,43 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
+
+import TranspilerService from "./services/transpiler/transpiler.js";
 
 import SearchBar from "./components/SearchBar/SearchBar.vue";
 import TheLyrics from "./components/TheLyrics/TheLyrics.vue";
 import TheLoading from "./components/TheLoading.vue";
 
-import LyricsAPIService from "./services/api/lyricsAPI.service";
+import LyricsAPIService from "./services/lyricsAPI.js";
 
 const loading = ref(false);
 const lyrics = ref(null);
 const embedController = ref(null);
 
+const handleReset = () => {
+  lyrics.value = null;
+  console.log(lyrics);
+};
+
 const handleSubmit = async (url) => {
   loading.value = true;
 
-  const test = new URL(url);
+  url =
+    "https://open.spotify.com/track/5rPnv4gceOGKCqbN06F2aJ?si=d820ada477d44684";
 
-  const [_, track] = test.pathname.split("/").filter((e) => !!e);
+  // const [_, trackId] = new URL(url).pathname.split("/").filter((e) => !!e);
 
-  createMusic(track);
+  // createMusic(trackId);
 
-  lyrics.value = await LyricsAPIService.getLyricsBySongUrl(url);
+  const rawLyrics = await LyricsAPIService.getLyricsBySongUrl(url);
+
+  lyrics.value = { lines: TranspilerService.transpileLyrics(rawLyrics) };
 
   loading.value = false;
 };
 
-const createMusic = (track) => {
+const createMusic = (trackId) => {
   let recaptchaScript = document.createElement("script");
   recaptchaScript.setAttribute(
     "src",
@@ -49,7 +59,7 @@ const createMusic = (track) => {
   window.onSpotifyIframeApiReady = (IFrameAPI) => {
     let element = document.getElementById("embed-iframe");
     let options = {
-      uri: "spotify:track:" + track,
+      uri: "spotify:track:" + trackId,
     };
     let callback = (EmbedController) => {
       embedController.value = EmbedController;

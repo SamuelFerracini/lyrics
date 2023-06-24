@@ -1,5 +1,10 @@
 <template>
-  <form class="w-1/2" @submit.prevent="handleSubmit" autocomplete="off">
+  <form
+    class="w-1/2"
+    @submit.prevent="handleSubmit"
+    @reset.prevent="handleReset"
+    autocomplete="off"
+  >
     <label
       for="default-search"
       class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -36,9 +41,15 @@
       />
       <button
         type="submit"
-        class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        class="text-white absolute right-24 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         Start
+      </button>
+      <button
+        type="reset"
+        class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+      >
+        Reset
       </button>
     </div>
   </form>
@@ -47,9 +58,10 @@
 import { ref } from "vue";
 
 defineProps({ modelValue: String });
-const emits = defineEmits(["submit"]);
+const emits = defineEmits(["submit", "reset"]);
 
 const url = ref("");
 
 const handleSubmit = () => emits("submit", url.value);
+const handleReset = () => emits("reset");
 </script>
